@@ -6,7 +6,5 @@ The competition will provide retrospectively collected clinical and imaging data
 
 File Structure:
 	
-	matching.R
-	clinical_data.rmd
-	imaging_data.rmd
-	write_data.rmd
+- Matching: PSM-Matching.R and analysisPlot.R
+- Competition sheet for Neurologists: clinical_data, imaging_data, write_data
