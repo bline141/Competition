@@ -2,16 +2,13 @@
 ## by Jonas Brändli & Nelly Blindenbacher
 ## June 2023
 
-# Set path to file path
+
+## Set path to file path-------------------------------------------------------
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 
-# Install packages
-install.packages("MatchIt")
-install.packages("readxl")
-install.packages("ggpubr")
-install.packages("VIM")
 
-# Load Libraries
+## Dependencies---------------------------------------------------------------
+install.packages(c("dplyr", "ggplot", "MatchIt", "readxl", "ggpubr", "kableExtra", "VIM"))
 library(dplyr)
 library(ggplot2)
 library(MatchIt)
@@ -20,19 +17,14 @@ library(ggpubr)
 library(kableExtra)
 library(VIM)
 
-# Source Files
+
+## Source Files---------------------------------------------------------------
 source("analysisPlot.R") # distribution plot
 
-# Load data
-clinicaldata_unprocessed <- read_xlsx("Originaldata_incl_imaging.xlsx")
 
-# Limit data set to patients with CTA and CTP
-clinicaldata_CT <- clinicaldata_unprocessed %>%
-  filter(CTA == "1") %>%
-  filter(CTP == "1")
-
-# Set variable type
-clinicaldata <- clinicaldata_CT %>%
+## Load, filter, set type and select clinical data-----------------------------
+clinicaldata <- read_xlsx("Originaldata_incl_imaging.xlsx") %>%
+  filter(CTA == "1", CTP == "1") %>%
   mutate(IAT = as.factor(i_iatrt),
          sex = as.factor(r_gender),
          age = as.numeric(age),
@@ -49,8 +41,12 @@ clinicaldata <- clinicaldata_CT %>%
          symptom_onset_to_door = as.numeric(dur_oa),
          NIHSS_baseline = as.factor(nihsco_abl_c),
          occlusion_site = as.factor(loc_cta_abl),
-         collateral_score = as.factor(cgsc_cta_abl_c))
+         collateral_score = as.factor(cgsc_cta_abl_c),
+         followid = as.numeric(followid)) %>%
+  select(c("IAT", "sex", "age", "IVT", "INR", "serum_creatinin", "systolic_blood_pressure", "diastolic_blood_pressure", "previous_stroke", 
+           "diabetes_mellitus", "hypertension", "atrial_fibrillation", "prestroke_mrs", "symptom_onset_to_door", "NIHSS_baseline", "occlusion_site", "collateral_score", "followid"))
 
+____________________________
 # Analyse missing data
 variables_of_interest <- c("sex", "age", "IVT", "INR", "serum_creatinin", "systolic_blood_pressure", "diastolic_blood_pressure", "previous_stroke", "diabetes_mellitus", "hypertension", "atrial_fibrillation", "prestroke_mrs", "symptom_onset_to_door", "NIHSS_baseline", "occlusion_site", "collateral_score")
 subset_data_of_interest <- clinicaldata[, variables_of_interest]
