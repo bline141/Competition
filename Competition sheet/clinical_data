@@ -2,30 +2,26 @@
 title: "Prediction competition"
 author: "Nelly Blindenbacher"
 date: "June 2023"
-output:
-  html_document:
-    df_print: paged
-  pdf_document: default
+output: pdf_document
+
 ---
 
 **Part 1: Clinical Data**
 
-```{r, echo=FALSE, error=FALSE, message=FALSE}
-# Set path to file path
-getwd()
-setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+```{r, echo=FALSE}
+# Set to file path
+XX
 
 # Load packages into R
 library(knitr)
 library(xtable)
 library(readxl)
-library(shiny)
 library(rmarkdown)
 library(tinytex)
 library(kableExtra)
 
 #Source file
-source(file = "Patient Selection.R")
+source(file = "PSM_Matching.R")
 
 #Summary
 summary(clinicaldata_selection)
@@ -35,13 +31,10 @@ df <- as.data.frame(clinicaldata_selection)
 df_transpose = (t(df))
 
 # Build the final table
-knitr::kable(df_transpose[,1], #fill in patient followid individually!
+knitr::kable(df_transpose[,1], #fill in patient followid individually
       format = "pipe",
       row.names = "TRUE", 
       col.names = "Study patient", 
       escape = FALSE)
 
-
 ```
-
-
