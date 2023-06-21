@@ -9,25 +9,18 @@ output: pdf_document
 **Part 1: Clinical Data**
 
 ```{r, echo=FALSE}
-# Set to file path
-XX
-
 # Load packages into R
 library(knitr)
 library(xtable)
 library(readxl)
 library(rmarkdown)
 library(tinytex)
-library(kableExtra)
 
-#Source file
-source(file = "PSM_Matching.R")
-
-#Summary
-summary(clinicaldata_selection)
-df <- as.data.frame(clinicaldata_selection)
+# Patient selection
+readxl::read_excel("") #Enter xlsx-file with Patient selection
 
 # Inverse row and columns
+df <- as.data.frame(clinicaldata_selection)
 df_transpose = (t(df))
 
 # Build the final table
@@ -36,5 +29,4 @@ knitr::kable(df_transpose[,1], #fill in patient followid individually
       row.names = "TRUE", 
       col.names = "Study patient", 
       escape = FALSE)
-
 ```
