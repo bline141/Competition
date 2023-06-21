@@ -10,7 +10,7 @@ library(imager)
 # Load Data --------------------------------------------------------------------
 
 bname <- "imaging_data.h5"
-fname <- "clinical_data.xlsx"
+fname <- readxl::read_xlsx("Originaldata_incl_imaging.xlsx")
 
 # Folder structures -------------------------------------------------------
 if (!dir.exists("results"))
