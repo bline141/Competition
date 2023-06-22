@@ -4,26 +4,26 @@
 
 
 ## Set path to file path-------------------------------------------------------
-setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+getwd()
+setwd("C:/Users/Nelly/Desktop/3 R Project Version Juni/")
 
 
 ## Dependencies---------------------------------------------------------------
-install.packages(c("dplyr", "ggplot", "MatchIt", "readxl", "ggpubr", "kableExtra", "VIM"))
+install.packages(c("dplyr", "ggplot", "MatchIt", "readxl", "ggpubr", "kableExtra"))
 library(dplyr)
 library(ggplot2)
 library(MatchIt)
 library(readxl)
 library(ggpubr)
 library(kableExtra)
-library(VIM)
 
 
 ## Source Files---------------------------------------------------------------
-source("analysisPlot.R") # distribution plot
+source("3 R Project Version Juni/Competition/analysisPlot.R") # distribution plot
 
 
 ## Load, filter, set type and select clinical data-----------------------------
-clinicaldata <- read_xlsx("Originaldata_incl_imaging.xlsx") %>%
+clinicaldata <- read_xlsx("3 R Project Version Juni/3 R Project Version Juni/Competition/Originaldata_incl_imaging.xlsx") %>%
   filter(CTA == "1", CTP == "1") %>%
   mutate(IAT = as.factor(i_iatrt),
          sex = as.factor(r_gender),
@@ -39,28 +39,50 @@ clinicaldata <- read_xlsx("Originaldata_incl_imaging.xlsx") %>%
          atrial_fibrillation = as.factor(b_pvaf),
          prestroke_mrs = as.factor(premrs),
          symptom_onset_to_door = as.numeric(dur_oa),
-         NIHSS_baseline = as.factor(nihsco_abl_c),
+         NIHSS_baseline = as.numeric(nihsco_abl_c),
          occlusion_site = as.factor(loc_cta_abl),
          collateral_score = as.factor(cgsc_cta_abl_c),
-         followid = as.numeric(followid)) %>%
+         followid = as.factor(followid)) %>%
   select(c("IAT", "sex", "age", "IVT", "INR", "serum_creatinin", "systolic_blood_pressure", "diastolic_blood_pressure", "previous_stroke", 
            "diabetes_mellitus", "hypertension", "atrial_fibrillation", "prestroke_mrs", "symptom_onset_to_door", "NIHSS_baseline", "occlusion_site", "collateral_score", "followid"))
 
-____________________________
-# Analyse missing data
-variables_of_interest <- c("sex", "age", "IVT", "INR", "serum_creatinin", "systolic_blood_pressure", "diastolic_blood_pressure", "previous_stroke", "diabetes_mellitus", "hypertension", "atrial_fibrillation", "prestroke_mrs", "symptom_onset_to_door", "NIHSS_baseline", "occlusion_site", "collateral_score")
-subset_data_of_interest <- clinicaldata[, variables_of_interest]
 
-missing_values <- colSums(is.na(subset_data_of_interest))
+## Analyse missing data---------------------------------------------------------
+# Dependencies
+install.packages("VIM")
+library(VIM)
 
-variables_with_missing <- names(missing_values[missing_values > 0])
-variables_with_missing
+# Find missing values
+anyNA(clinicaldata)
+missing_values <- colSums(is.na(clinicaldata))
+print(missing_values)
 
-subset_missing_data <- clinicaldata[,variables_with_missing]
+# Display and check for systematic missing values
+clinicaldata_missing <- clinicaldata[,c("INR", "serum_creatinin", "symptom_onset_to_door", "collateral_score")]
+na <- aggr(clinicaldata_missing, plot = FALSE)
+plot(na, numbers = TRUE, prop = FALSE, cex.axis = 0.3)
 
-a <- aggr(subset_missing_data, plot = FALSE)
-plot(a, numbers = TRUE, prop = FALSE, cex.axis = 0.4)
+## Impute missing data with missForest------------------------------------------
+# Dependencies 
+install.packages("missForest")
+library(missForest)
 
+#Turn into factors
+clinicaldata$INR <- as.factor(clinicaldata$INR) 
+clinicaldata$serum_creatinin <- as.factor(clinicaldata$serum_creatinin)
+clinicaldata$symptom_onset_to_door <- as.factor(clinicaldata$symptom_onset_to_door) 
+apply(clinicaldata, 2, function(x) sum(is.na(x)))
+
+#Check how many levels there are
+nlevels(clinicaldata$INR)
+nlevels(clinicaldata$serum_creatinin) #77 levels is too much
+nlevels(clinicaldata$symptom_onset_to_door) #147 levels is too much
+nlevels(clinicaldata$occlusion_site)
+
+set.seed(2)
+imp <- missForest(clinicaldata_test) #Error: Can not handle categorical predictors with more than 53 categories.
+imp$OOBerror
+--- Stand 22.06.2023
 
 # Visualize Data Distribution
 plotColumns0 <- c("sex", "age", "IVT", "INR", "serum_creatinin", 
