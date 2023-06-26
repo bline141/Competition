@@ -8,7 +8,7 @@ getwd()
 setwd("Projekte/9 CT Model vs. Neurologist/Competition/")
 
 
-## General Dependencies--------------------------------------------------------
+## Dependencies--------------------------------------------------------
 install.packages(c("dplyr", "ggplot", "MatchIt", "readxl", "ggpubr", "kableExtra"))
 library(dplyr)
 library(ggplot2)
@@ -73,12 +73,12 @@ clinicaldata_imp <- missForest(clinicaldata[, variables_with_na],
                                verbose = TRUE, maxiter = 50, ntree = 500, mtry = 3)
 clinicaldata_imp$OOBerror
 
-# Save, round and import imputed values
+# Save and round imputed values
 clinicaldata_imputed <- clinicaldata_imp$ximp #Save as dataframe
 numeric_vars <- sapply(clinicaldata_imputed, is.numeric) # Identify numeric variables
 clinicaldata_imputed[numeric_vars] <- round(clinicaldata_imputed[numeric_vars], 0) # Round numeric variables
 
-# Import imputed values into clinical data set
+# Import imputed values into "clinicaldata" set
 clinicaldata$INR <- clinicaldata_imputed$INR
 clinicaldata$serum_creatinin <- clinicaldata_imputed$serum_creatinin
 clinicaldata$symptom_onset_to_door <- clinicaldata_imputed$symptom_onset_to_door
@@ -154,7 +154,6 @@ pairs2 <- sample(unique(psmMatchDF$subclass), 20)
 psmMatchDF_short2 <- psmMatchDF %>%
   filter(., subclass %in% pairs2)
 
-
 ## Plot Distributions 
 # first col before matching, 
 # second col after matching, 
@@ -188,13 +187,11 @@ clinicaldata_selection <- psmMatchDF_short1 %>%
            `occlusion_site` == 6 ~ "A2",
            TRUE ~ `occlusion_site`))
 
-# Final table of 40 selected patients
+# Final table of 40 selected patients----------------------------------------------
 kable(clinicaldata_selection, format = "html", escape = FALSE) %>%
   kable_styling(bootstrap_options = "striped", full_width = FALSE)
 
-
-#Export
+#Export excel of 40 selected patients 
 install.packages("openxlsx")
 library(openxlsx)
-
 write.xlsx(clinicaldata_selection, "Clinical Data Selection.xlsx")
