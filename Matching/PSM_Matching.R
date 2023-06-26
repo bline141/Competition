@@ -8,7 +8,7 @@ getwd()
 setwd("Projekte/9 CT Model vs. Neurologist/Competition/")
 
 
-## General Dependencies---------------------------------------------------------------
+## General Dependencies--------------------------------------------------------
 install.packages(c("dplyr", "ggplot", "MatchIt", "readxl", "ggpubr", "kableExtra"))
 library(dplyr)
 library(ggplot2)
@@ -16,10 +16,6 @@ library(MatchIt)
 library(readxl)
 library(ggpubr)
 library(kableExtra)
-
-
-## Source Files---------------------------------------------------------------
-source("analysisPlot.R") # distribution plot
 
 
 ## Load, filter, set type and select clinical data-----------------------------
@@ -57,17 +53,18 @@ anyNA(clinicaldata)
 missing_values <- colSums(is.na(clinicaldata))
 print(missing_values)
 
-# Display and check for systematic missing values
+# Show missing values and check for systematic missings
 clinicaldata_missing <- clinicaldata[,c("INR", "serum_creatinin", "symptom_onset_to_door", "collateral_score")]
 na <- aggr(clinicaldata_missing, plot = FALSE)
 plot(na, numbers = TRUE, prop = FALSE, cex.axis = 0.3) # data is not systematically missing
+
 
 ## Impute missing data with missForest------------------------------------------
 # Dependencies 
 install.packages("missForest")
 library(missForest)
 
-# Impute missing values and check accuracy
+# Impute missing values
 set.seed(7)
 clinicaldata <- as.data.frame(clinicaldata)
 variables_with_na <- c("INR", "serum_creatinin", "symptom_onset_to_door", "collateral_score")
@@ -75,7 +72,20 @@ clinicaldata_imp <- missForest(clinicaldata[, variables_with_na],
                                xtrue = clinicaldata[, variables_with_na], 
                                verbose = TRUE, maxiter = 50, ntree = 500, mtry = 3)
 clinicaldata_imp$OOBerror
-clinicaldata_imputed <- clinicaldata_imp$ximp
+
+# Save, round and import imputed values
+clinicaldata_imputed <- clinicaldata_imp$ximp #Save as dataframe
+numeric_vars <- sapply(clinicaldata_imputed, is.numeric) # Identify numeric variables
+clinicaldata_imputed[numeric_vars] <- round(clinicaldata_imputed[numeric_vars], 0) # Round numeric variables
+
+# Import imputed values into clinical data set
+clinicaldata$INR <- clinicaldata_imputed$INR
+clinicaldata$serum_creatinin <- clinicaldata_imputed$serum_creatinin
+clinicaldata$symptom_onset_to_door <- clinicaldata_imputed$symptom_onset_to_door
+clinicaldata$collateral_score <- clinicaldata_imputed$collateral_score
+
+## Source Files---------------------------------------------------------------
+source("analysisPlot.R") # distribution plot
 
 # Visualize Data Distribution---------------------------------------------------
 plotColumns0 <- c("IAT", "sex", "age", "IVT", "INR", "serum_creatinin", "systolic_blood_pressure", "diastolic_blood_pressure", "previous_stroke", 
@@ -87,11 +97,11 @@ ggarrange(plotlist = p0, ncol = 4, nrow = 4, common.legend = T, legend = "bottom
 # PSM Matching------------------------------------------------------------------
 set.seed(1)
 psmMatch <- matchit(
-  IAT ~ sex + age + IVT + systolic_blood_pressure + 
+  IAT ~ sex + age + IVT + INR + serum_creatinin + systolic_blood_pressure + 
     diastolic_blood_pressure + previous_stroke + 
     diabetes_mellitus + hypertension + 
-    atrial_fibrillation + prestroke_mrs + 
-    NIHSS_baseline,
+    atrial_fibrillation + prestroke_mrs + symptom_onset_to_door +
+    NIHSS_baseline + occlusion_site + collateral_score,
   data = clinicaldata, 
   distance = "glm", # logistic regression
   link = "logit", # logit link function
@@ -106,7 +116,7 @@ preMatchDF$distance <- psmMatch$distance
 # Post Matching
 summary(psmMatch)
 psmMatchDF <- match.data(psmMatch)
-# 92 patients in the Control Group are unmatched and therefore omitted
+# 82 patients are unmatched and therefore omitted
 
 # Propensity Score Plot
 ggarrange(analysisPlot(preMatchDF, "distance", "IAT"),
@@ -159,23 +169,6 @@ ggarrange(plotlist = c(p1,p2,p3,p4)[newOrder], nrow = 4, ncol = 4,
 
 # Display the 20 pairs with the smallest difference in propensity score
 clinicaldata_selection <- psmMatchDF_short1 %>%
-  select(`IAT` = i_iatrt,
-         `age` = age,
-         `sex` = r_gender,
-         `IVT`= r_ivtrom,
-         `INR` = linr_abl,
-         `serum_creatinin` = lkreat_abl,
-         `systolic_blood_pressure` = rrsyst_abl,
-         `diastolic_blood_pressure` = rrdias_abl,
-         `previous_stroke` = b_pvstr,
-         `diabetes_mellitus` = b_pvdm,
-         `hypertension` = b_pvrr,
-         `atrial_fibrillation` = b_pvaf,
-         `prestroke_mrs` = premrs,
-         `symptom_onset_to_door` = dur_oa,
-         `NIHSS_baseline` = nihsco_abl_c,
-         `occlusion_site` = loc_cta_abl,
-         `collateral_score` = cgsc_cta_abl_c) %>%
   mutate(`age` = round(`age`),
          `sex` = ifelse(`sex` == 0, "M", "F"),
          `IAT` = ifelse(`IAT` == 0, "No", "Yes"),
@@ -198,3 +191,10 @@ clinicaldata_selection <- psmMatchDF_short1 %>%
 # Final table of 40 selected patients
 kable(clinicaldata_selection, format = "html", escape = FALSE) %>%
   kable_styling(bootstrap_options = "striped", full_width = FALSE)
+
+
+#Export
+install.packages("openxlsx")
+library(openxlsx)
+
+write.xlsx(clinicaldata_selection, "Clinical Data Selection.xlsx")
