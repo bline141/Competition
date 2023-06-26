@@ -5,10 +5,10 @@
 
 ## Set path to file path-------------------------------------------------------
 getwd()
-setwd("C:/Users/Nelly/Desktop/3 R Project Version Juni/")
+setwd("Projekte/9 CT Model vs. Neurologist/Competition/")
 
 
-## Dependencies---------------------------------------------------------------
+## General Dependencies---------------------------------------------------------------
 install.packages(c("dplyr", "ggplot", "MatchIt", "readxl", "ggpubr", "kableExtra"))
 library(dplyr)
 library(ggplot2)
@@ -19,11 +19,11 @@ library(kableExtra)
 
 
 ## Source Files---------------------------------------------------------------
-source("3 R Project Version Juni/Competition/analysisPlot.R") # distribution plot
+source("analysisPlot.R") # distribution plot
 
 
 ## Load, filter, set type and select clinical data-----------------------------
-clinicaldata <- read_xlsx("3 R Project Version Juni/3 R Project Version Juni/Competition/Originaldata_incl_imaging.xlsx") %>%
+clinicaldata <- read_xlsx("Originaldata_incl_imaging.xlsx") %>%
   filter(CTA == "1", CTP == "1") %>%
   mutate(IAT = as.factor(i_iatrt),
          sex = as.factor(r_gender),
@@ -42,7 +42,7 @@ clinicaldata <- read_xlsx("3 R Project Version Juni/3 R Project Version Juni/Com
          NIHSS_baseline = as.numeric(nihsco_abl_c),
          occlusion_site = as.factor(loc_cta_abl),
          collateral_score = as.factor(cgsc_cta_abl_c),
-         followid = as.factor(followid)) %>%
+         followid = as.numeric(followid)) %>%
   select(c("IAT", "sex", "age", "IVT", "INR", "serum_creatinin", "systolic_blood_pressure", "diastolic_blood_pressure", "previous_stroke", 
            "diabetes_mellitus", "hypertension", "atrial_fibrillation", "prestroke_mrs", "symptom_onset_to_door", "NIHSS_baseline", "occlusion_site", "collateral_score", "followid"))
 
@@ -60,42 +60,31 @@ print(missing_values)
 # Display and check for systematic missing values
 clinicaldata_missing <- clinicaldata[,c("INR", "serum_creatinin", "symptom_onset_to_door", "collateral_score")]
 na <- aggr(clinicaldata_missing, plot = FALSE)
-plot(na, numbers = TRUE, prop = FALSE, cex.axis = 0.3)
+plot(na, numbers = TRUE, prop = FALSE, cex.axis = 0.3) # data is not systematically missing
 
 ## Impute missing data with missForest------------------------------------------
 # Dependencies 
 install.packages("missForest")
 library(missForest)
 
-#Turn into factors
-clinicaldata$INR <- as.factor(clinicaldata$INR) 
-clinicaldata$serum_creatinin <- as.factor(clinicaldata$serum_creatinin)
-clinicaldata$symptom_onset_to_door <- as.factor(clinicaldata$symptom_onset_to_door) 
-apply(clinicaldata, 2, function(x) sum(is.na(x)))
+# Impute missing values and check accuracy
+set.seed(7)
+clinicaldata <- as.data.frame(clinicaldata)
+variables_with_na <- c("INR", "serum_creatinin", "symptom_onset_to_door", "collateral_score")
+clinicaldata_imp <- missForest(clinicaldata[, variables_with_na], 
+                               xtrue = clinicaldata[, variables_with_na], 
+                               verbose = TRUE, maxiter = 50, ntree = 500, mtry = 3)
+clinicaldata_imp$OOBerror
+clinicaldata_imputed <- clinicaldata_imp$ximp
 
-#Check how many levels there are
-nlevels(clinicaldata$INR)
-nlevels(clinicaldata$serum_creatinin) #77 levels is too much
-nlevels(clinicaldata$symptom_onset_to_door) #147 levels is too much
-nlevels(clinicaldata$occlusion_site)
-
-set.seed(2)
-imp <- missForest(clinicaldata_test) #Error: Can not handle categorical predictors with more than 53 categories.
-imp$OOBerror
---- Stand 22.06.2023
-
-# Visualize Data Distribution
-plotColumns0 <- c("sex", "age", "IVT", "INR", "serum_creatinin", 
-                  "systolic_blood_pressure", "diastolic_blood_pressure", 
-                  "previous_stroke", "diabetes_mellitus", "hypertension", 
-                  "atrial_fibrillation", "prestroke_mrs", 
-                  "symptom_onset_to_door", "NIHSS_baseline", 
-                  "occlusion_site", "collateral_score")
+# Visualize Data Distribution---------------------------------------------------
+plotColumns0 <- c("IAT", "sex", "age", "IVT", "INR", "serum_creatinin", "systolic_blood_pressure", "diastolic_blood_pressure", "previous_stroke", 
+                  "diabetes_mellitus", "hypertension", "atrial_fibrillation", "prestroke_mrs", "symptom_onset_to_door", "NIHSS_baseline", "occlusion_site", "collateral_score")
 p0 <- lapply(plotColumns0, analysisPlot, df = clinicaldata, therapy="IAT")
 ggarrange(plotlist = p0, ncol = 4, nrow = 4, common.legend = T, legend = "bottom")
 
 
-# PSM Matching
+# PSM Matching------------------------------------------------------------------
 set.seed(1)
 psmMatch <- matchit(
   IAT ~ sex + age + IVT + systolic_blood_pressure + 
