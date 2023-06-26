@@ -1,0 +1,38 @@
+## Descriptive Statistics
+## Nelly Blindenbacher
+## June 2023
+
+## Set path to file path-------------------------------------------------------
+getwd()
+setwd("Projekte/9 CT Model vs. Neurologist/Competition/")
+
+## Dependencies--------------------------------------------------------
+install.packages("psych")
+install.packages("knitr")
+install.packages("dplyr")
+library(readxl)
+library(dplyr)
+library(psych)
+library(knitr)
+library(dplyr)
+
+## Selected 40 patients-------------------------------------------------
+followid_filter <- c("007", "008", "038", "043", "054", "068", "114", "145", "164", "166", "190", "198", "206", "228", "229",
+                     "298", "310", "312", "319", "320", "321", "326", "327", "333", "336", "345", "346", "354", "359", "371", 
+                     "373", "376", "393", "414", "421", "426", "458", "476", "480", "482")
+
+clinicaldata <- read_xlsx("Originaldata_incl_imaging.xlsx") %>%
+  filter(followid %in% followid_filter)
+
+# Generate an overview of the data--------------------------------------
+overview <- summary(clinicaldata)
+
+# Print the overview
+print(overview)
+
+# Compute descriptive statistics----------------------------------------
+stats <- describe(clinicaldata)
+
+# Print the descriptive statistics
+print(stats)
+
