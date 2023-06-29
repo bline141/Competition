@@ -1,11 +1,12 @@
 ## Competition
-#Project Title: 
-Comparing Deep Learning with Neurologists for Functional Outcome Prediction in Stroke: An Observational Follow-up Study.
 
-Project Description: A CT A CT DL model will compete against experienced neurologists in treatment effect and functional outcome prediction.
-The competition will provide retrospectively collected clinical and imaging data from 40 selected patients from the MR cohort.
+Project Title: 
+Comparing Deep Learning with Neurologists for Functional Outcome Prediction in Stroke: A Follow-up Study.
 
-Procedure as follows:
+Project Description: 
+The CT deep learning model was trained on data from the MR Cohort to predict the treatment effect (NIHSS after 24h) and the functional outcome (mRS after 3 months) in the patients. For further validation the CT deep learning treatment effect and outcome predictions where compared to those of experienced neurologists on a subset of 40 patients matched for baseline variables.
+
+Procedure for competition as follows:
 
 1. Step: Descriptive Statistics (Table one for the MR cohort)
 2. Step: Matching (Selection of 40 patients matched for BL variables)
