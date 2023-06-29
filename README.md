@@ -6,7 +6,7 @@ The competition will provide retrospectively collected clinical and imaging data
 
 Procedure followed:
 
-1. Step: Matching *(Selection of 40 patients matched for BL variables)*
-2. Step: Anonymisation
-3. Step: Structure
-4. Step: Competition sheet: clinical_data, imaging_data, write_data *#Working sheet for neurologists*
+1. Step: Matching (Selection of 40 patients matched for BL variables)
+2. Step: Anonymisation (Assignment of anonymous ID to each patient from the selection)
+3. Step: Structure (Structuring and organising the folders)
+4. Step: Competition sheet (A without CTP / B with CTP)
