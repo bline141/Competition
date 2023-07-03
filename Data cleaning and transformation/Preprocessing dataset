@@ -18,9 +18,12 @@ library(kableExtra)
 ## Load data ------------------------------------------------------------------
 clinicaldata <- read_xlsx("Originaldata_incl_imaging.xlsx") %>%
   
-  # Exclude patients without CTA/CTP
+  # Exclude patients with missing imaging data (CTA/CTP)
   filter(CTA == "1", CTP == "1") %>%
   
+  # Exclude patients with missing outcome (NIHSS_24h or MRS_90d)
+  filter(!is.na(nihsco_b24h), !is.na(mrs_d90d_c)) %>%
+
   # Variable naming and scaling
   mutate(
     IAT = as.factor(i_iatrt),
@@ -54,10 +57,8 @@ clinicaldata <- read_xlsx("Originaldata_incl_imaging.xlsx") %>%
     followid = as.numeric(followid),
     MRS_90d = as.numeric(mrs_d90d_c),
     NIHSS_24h = as.numeric(nihsco_b24h)
-  ) %>% 
-  
-  # Exclude patients with missing outcome (NIHSS_24h or MRS_90d)
-  filter(!is.na(NIHSS_24h), !is.na(MRS_90d))
+  )
+
 
 ## Missing data analysis---------------------------------------------------------
 # Dependencies
