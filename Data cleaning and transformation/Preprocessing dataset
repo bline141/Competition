@@ -6,6 +6,15 @@
 getwd()
 setwd("\\\\fs-home/bline$/Documents/Projekte/9 CT Model vs. Neurologist/2 R Versions/3 Week 27")
 
+## Dependencies ------------------------------------------------------------------
+install.packages(c("dplyr", "ggplot", "MatchIt", "readxl", "ggpubr", "kableExtra"))
+library(dplyr)
+library(ggplot2)
+library(MatchIt)
+library(readxl)
+library(ggpubr)
+library(kableExtra)
+
 ## Load data ------------------------------------------------------------------
 clinicaldata <- read_xlsx("Originaldata_incl_imaging.xlsx") %>%
   
@@ -86,11 +95,13 @@ clinicaldata_imp <- missForest(clinicaldata_selection[, variables_with_na],
 clinicaldata_imp$OOBerror
 
 # Save and round imputed values
-clinicaldata_imputed <- clinicaldata_imp$ximp #Save as dataframe
+clinicaldata_imputed <- clinicaldata_imp$ximp # Save as a data frame
 numeric_vars <- sapply(clinicaldata_imputed, is.numeric) # Identify numeric variables
-clinicaldata_imputed[numeric_vars] <- round(clinicaldata_imputed[numeric_vars], 0) # Round numeric variables
+clinicaldata_imputed$INR <- round(clinicaldata_imputed$INR, 1) # Round INR to 1 digit after decimal point
+clinicaldata_imputed$serum_creatinin <- round(clinicaldata_imputed$serum_creatinin, 0) # Round serum_creatinin to 0 digits after decimal point
+clinicaldata_imputed$symptom_onset_to_door <- round(clinicaldata_imputed$symptom_onset_to_door, 0) # Round onset_to_door_time to 0 digits after decimal point
 
-# Import imputed values into "clinicaldata" set
+# Import imputed values into "clinicaldata" data frame
 clinicaldata$INR <- clinicaldata_imputed$INR
 clinicaldata$serum_creatinin <- clinicaldata_imputed$serum_creatinin
 clinicaldata$symptom_onset_to_door <- clinicaldata_imputed$symptom_onset_to_door
