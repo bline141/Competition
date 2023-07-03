@@ -4,34 +4,38 @@
 
 ## Set path to file path-------------------------------------------------------
 getwd()
-setwd("Projekte/9 CT Model vs. Neurologist/Competition/")
+setwd("\\\\fs-home/bline$/Documents/Projekte/9 CT Model vs. Neurologist/2 R Versions/3 Week 27")
+
+## Load data-------------------------------------------------------
+clinicaldata <- read_xlsx("Originaldata_cleaned.xlsx")
 
 ## Dependencies--------------------------------------------------------
 install.packages("psych")
 install.packages("knitr")
 install.packages("dplyr")
+install.packages("tableone")
 library(readxl)
 library(dplyr)
 library(psych)
 library(knitr)
 library(dplyr)
+library(tableone)
 
-## Selected 40 patients-------------------------------------------------
-followid_filter <- c("007", "008", "038", "043", "054", "068", "114", "145", "164", "166", "190", "198", "206", "228", "229",
-                     "298", "310", "312", "319", "320", "321", "326", "327", "333", "336", "345", "346", "354", "359", "371", 
-                     "373", "376", "393", "414", "421", "426", "458", "476", "480", "482")
-
-clinicaldata <- read_xlsx("Originaldata_incl_imaging.xlsx") %>%
-  filter(followid %in% followid_filter)
-
-# Generate an overview of the data--------------------------------------
+## Overview--------------------------------------------------------------------
 overview <- summary(clinicaldata)
-
-# Print the overview
 print(overview)
-
-# Compute descriptive statistics----------------------------------------
 stats <- describe(clinicaldata)
-
-# Print the descriptive statistics
 print(stats)
+
+## Build table one-------------------------------------------------------------
+myVars <- c("IAT", "sex", "age", "IVT", "INR", "serum_creatinin", "systolic_blood_pressure", "diastolic_blood_pressure", "previous_stroke", 
+            "diabetes_mellitus", "hypertension", "atrial_fibrillation", "prestroke_mrs", "symptom_onset_to_door", "NIHSS_baseline", "occlusion_site", "collateral_score", "NIHSS_24h", "MRS_90d")
+
+#Overall
+tab1 <- CreateTableOne(data = clinicaldata, vars = myVars)
+tab1
+
+# Stratified by IAT
+tab2 <- CreateTableOne(data = clinicaldata, vars = myVars, strata = "IAT")
+tab2
+
