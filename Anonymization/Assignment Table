@@ -19,6 +19,7 @@ clinicaldata <- read_excel("Selection_Originaldata_incl_imaging.xlsx")
 patient_ID <- clinicaldata$followid
 
 # Generate random six-digit numbers
+set.seed(1234)
 random_numbers <- sample(100000:999999, length(patient_ID), replace = TRUE)
 
 # Generate anonym ID using random numbers
