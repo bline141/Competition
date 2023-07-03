@@ -9,6 +9,8 @@ setwd("\\\\fs-home/bline$/Documents/Projekte/9 CT Model vs. Neurologist/2 R Vers
 ## Dependencies----------------------------------------------------------------
 install.packages("readxl")
 library(readxl)
+install.packages("openxlsx")
+library(openxlsx)
 
 ## Load data--------------------------------------------------------------------
 # Open file with 40 selected patient data after matching
@@ -40,6 +42,11 @@ print(anonymname)
 print(assignment_table)
 
 ## Export assignment table------------------------------------------------------
-install.packages("openxlsx")
-library(openxlsx)
-write.xlsx(assignment_table, "AnonymID_assigned.xlsx")
+write.xlsx(assignment_table, "Assignment table.xslx")
+
+## Add anonym_ID to the dataset-----------------------------------------------
+clinicaldata_matched <- transform(clinicaldata_matched, anonym_ID = anonym_ID)
+write.xlsx(clinicaldata_matched, "Data_matched_incl_anonymization.xlsx")
+
+
+
