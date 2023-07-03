@@ -1,0 +1,97 @@
+## Preprocessing dataset
+## Nelly Blindenbacher
+## July 2023
+
+## Set path to file path-------------------------------------------------------
+getwd()
+setwd("\\\\fs-home/bline$/Documents/Projekte/9 CT Model vs. Neurologist/2 R Versions/3 Week 27")
+
+## Load data ------------------------------------------------------------------
+clinicaldata <- read_xlsx("Originaldata_incl_imaging.xlsx") %>%
+  
+  # Exclude patients without CTA/CTP
+  filter(CTA == "1", CTP == "1") %>%
+  
+  # Variable naming and scaling
+  mutate(
+    IAT = as.factor(i_iatrt),
+    sex = as.factor(ifelse(r_gender == 0, "M", "F")),
+    age = round(as.numeric(age)),
+    IVT = as.factor(ifelse(r_ivtrom == 0, "No", "Yes")),
+    INR = as.numeric(linr_abl),
+    serum_creatinin = as.numeric(lkreat_abl),
+    systolic_blood_pressure = as.numeric(rrsyst_abl),
+    diastolic_blood_pressure = as.numeric(rrdias_abl),
+    previous_stroke = as.factor(ifelse(b_pvstr == 0, "No", "Yes")),
+    diabetes_mellitus = as.factor(ifelse(b_pvdm == 0, "No", "Yes")),
+    hypertension = as.factor(ifelse(b_pvrr == 0, "No", "Yes")),
+    atrial_fibrillation = as.factor(ifelse(b_pvaf == 0, "No", "Yes")),
+    prestroke_mrs = as.factor(premrs),
+    symptom_onset_to_door = as.numeric(dur_oa),
+    NIHSS_baseline = as.numeric(nihsco_abl_c),
+    occlusion_site = factor(
+      case_when(
+        loc_cta_abl == 0 ~ "No occlusion present",
+        loc_cta_abl == 1 ~ "ICA",
+        loc_cta_abl == 2 ~ "ICA-T",
+        loc_cta_abl == 3 ~ "M1",
+        loc_cta_abl == 4 ~ "M2",
+        loc_cta_abl == 5 ~ "A1",
+        loc_cta_abl == 6 ~ "A2",
+        TRUE ~ as.character(loc_cta_abl)
+      )
+    ),
+    collateral_score = as.factor(cgsc_cta_abl_c),
+    followid = as.numeric(followid)
+  )
+
+## Missing data analysis---------------------------------------------------------
+# Dependencies
+install.packages("VIM")
+library(VIM)
+
+# Select relevant variables
+clinicaldata_selection <- clinicaldata %>%
+  select(c("IAT", "sex", "age", "IVT", "INR", "serum_creatinin", "systolic_blood_pressure", "diastolic_blood_pressure", "previous_stroke", 
+           "diabetes_mellitus", "hypertension", "atrial_fibrillation", "prestroke_mrs", "symptom_onset_to_door", "NIHSS_baseline", "occlusion_site", "collateral_score", "followid"))
+
+# Find missing values
+anyNA(clinicaldata_selection)
+missing_values <- colSums(is.na(clinicaldata_selection))
+print(missing_values)
+
+# Show missing values and check for systematic missings
+clinicaldata_missing <- clinicaldata_selection[,c("INR", "serum_creatinin", "symptom_onset_to_door", "collateral_score")]
+na <- aggr(clinicaldata_missing, plot = FALSE)
+plot(na, numbers = TRUE, prop = FALSE, cex.axis = 0.3) # data is not systematically missing
+
+
+## Impute missing data with missForest------------------------------------------
+# Dependencies 
+install.packages("missForest")
+library(missForest)
+
+# Impute missing values
+set.seed(7)
+clinicaldata_selection <- as.data.frame(clinicaldata_selection)
+variables_with_na <- c("INR", "serum_creatinin", "symptom_onset_to_door", "collateral_score")
+clinicaldata_imp <- missForest(clinicaldata_selection[, variables_with_na], 
+                               xtrue = clinicaldata_selection[, variables_with_na], 
+                               verbose = TRUE, maxiter = 50, ntree = 500, mtry = 3)
+clinicaldata_imp$OOBerror
+
+# Save and round imputed values
+clinicaldata_imputed <- clinicaldata_imp$ximp #Save as dataframe
+numeric_vars <- sapply(clinicaldata_imputed, is.numeric) # Identify numeric variables
+clinicaldata_imputed[numeric_vars] <- round(clinicaldata_imputed[numeric_vars], 0) # Round numeric variables
+
+# Import imputed values into "clinicaldata" set
+clinicaldata$INR <- clinicaldata_imputed$INR
+clinicaldata$serum_creatinin <- clinicaldata_imputed$serum_creatinin
+clinicaldata$symptom_onset_to_door <- clinicaldata_imputed$symptom_onset_to_door
+clinicaldata$collateral_score <- clinicaldata_imputed$collateral_score
+
+## Export cleaned data---------------------------------------- 
+install.packages("openxlsx")
+library(openxlsx)
+write.xlsx(clinicaldata, "Originaldata_cleaned.xlsx")
