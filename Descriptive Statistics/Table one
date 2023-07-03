@@ -7,7 +7,7 @@ getwd()
 setwd("\\\\fs-home/bline$/Documents/Projekte/9 CT Model vs. Neurologist/2 R Versions/3 Week 27")
 
 ## Load data-------------------------------------------------------
-clinicaldata <- read_xlsx("Originaldata_cleaned.xlsx")
+clinicaldata_cleaned <- read_xlsx("Originaldata_cleaned.xlsx")
 
 ## Dependencies--------------------------------------------------------
 install.packages("psych")
@@ -22,20 +22,18 @@ library(dplyr)
 library(tableone)
 
 ## Overview--------------------------------------------------------------------
-overview <- summary(clinicaldata)
+overview <- summary(clinicaldata_cleaned)
 print(overview)
-stats <- describe(clinicaldata)
-print(stats)
 
 ## Build table one-------------------------------------------------------------
 myVars <- c("IAT", "sex", "age", "IVT", "INR", "serum_creatinin", "systolic_blood_pressure", "diastolic_blood_pressure", "previous_stroke", 
             "diabetes_mellitus", "hypertension", "atrial_fibrillation", "prestroke_mrs", "symptom_onset_to_door", "NIHSS_baseline", "occlusion_site", "collateral_score", "NIHSS_24h", "MRS_90d")
 
-#Overall
-tab1 <- CreateTableOne(data = clinicaldata, vars = myVars)
+#OVerall
+tab1 <- CreateTableOne(data = clinicaldata_cleaned, vars = myVars)
 tab1
 
 # Stratified by IAT
-tab2 <- CreateTableOne(data = clinicaldata, vars = myVars, strata = "IAT")
+tab2 <- CreateTableOne(data = clinicaldata_cleaned, vars = myVars, strata = "IAT")
 tab2
 
