@@ -1,6 +1,5 @@
 ## Competition
 
-Project Title: 
 Comparing Deep Learning with Neurologists for Functional Outcome Prediction in Stroke: A Follow-up Study.
 
 Project Description: 
