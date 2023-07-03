@@ -30,7 +30,7 @@ assignment_table <- data.frame(originalname = patient_ID, anonym = anonym_ID)
 
 ## Test anonymization and traceability---------------------------------------
 # Example: Patient with follow id "OPS3"
-follow_id <- "OPS315169"
+follow_id <- "OPS971805"
 originalname <- assignment_table$originalname[assignment_table$anonym == follow_id]
 print(originalname)
 anonymname <- assignment_table$anonym[assignment_table$anonym == follow_id]
