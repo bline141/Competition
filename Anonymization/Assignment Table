@@ -42,4 +42,4 @@ print(assignment_table)
 ## Export assignment table------------------------------------------------------
 install.packages("openxlsx")
 library(openxlsx)
-write.xlsx(assignment_table, "Data_assigned.xlsx")
+write.xlsx(assignment_table, "AnonymID_assigned.xlsx")
