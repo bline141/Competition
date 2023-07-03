@@ -8,7 +8,7 @@ The CT deep learning model was trained on data from the MR Cohort to predict the
 
 Procedure for competition as follows:
 
-1. Step: Data cleaning and transformation
+1. Step: Data cleaning and transformation (Exclusion of patients, definition of variables and imputation)
 2. Step: Descriptive Statistics (Table one for the MR cohort)
 3. Step: Matching (Selection of 40 patients matched for BL variables)
 4. Step: Anonymisation (Assignment of anonymous ID to each patient from the selection)
