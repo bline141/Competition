@@ -110,4 +110,4 @@ clinicaldata$collateral_score <- clinicaldata_imputed$collateral_score
 ## Export cleaned data---------------------------------------- 
 install.packages("openxlsx")
 library(openxlsx)
-write.xlsx(clinicaldata, "Originaldata_cleaned.xlsx")
+write.xlsx(clinicaldata, "Data_cleaned.xlsx")
