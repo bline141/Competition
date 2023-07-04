@@ -26,7 +26,7 @@ clinicaldata <- read_xlsx("Originaldata_incl_imaging.xlsx") %>%
 
   # Variable naming and scaling
   mutate(
-    IAT = as.factor(ifelse(i_iatrt == 0, "No", "Yes"),
+    IAT = as.factor(ifelse(i_iatrt == 0, "No", "Yes")),
     sex = as.factor(ifelse(r_gender == 0, "M", "F")),
     age = round(as.numeric(age)),
     IVT = as.factor(ifelse(r_ivtrom == 0, "No", "Yes")),
