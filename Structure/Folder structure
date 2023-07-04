@@ -2,26 +2,24 @@
 ## Nelly Blindenbacher
 ## July 2023
 
-# Set directory -------------------------------------------------------
-getwd()
+# Set directory
 setwd("\\\\fs-home\\bline$\\Documents\\Projekte\\9 CT Model vs. Neurologist\\2 R Versions\\3 Week 27")
 
-## Create folders -------------------------------------------------------
-# Competition folder for each rater
-for (i in 1:8) {
-  competition_folder <- paste0("Competition_", i)
-  
-  if (!dir.exists(competition_folder))
-    dir.create(competition_folder)
-  
-  dir.create(file.path(competition_folder, "Part 1")) # Clinical data and NCCT/CTA
-  dir.create(file.path(competition_folder, "Part 2")) # Clinical data and NCCT/CTA/CTP
-  
-  sapply(assignment_table$anonym, function(x) {
-    dir.create(file.path(competition_folder, "Part 1", x))
-  })
-  
-  sapply(assignment_table$anonym, function(x) {
-    dir.create(file.path(competition_folder, "Part 2", x))
-  })
+# Load data
+clinicaldata_anonym <- read.xlsx("Data_matched_incl_anonymization.xlsx")
+
+# Define the main folder name
+main_folder_name <- "Competition_Data"
+
+# Create the main folder within the current directory
+main_folder <- file.path(getwd(), main_folder_name)
+if (!dir.exists(main_folder)) {
+  dir.create(main_folder)
 }
+
+# Create subfolders for each anonym_ID
+sapply(clinicaldata_anonym$anonym, function(x) {
+  dir.create(file.path(main_folder, "Part 1", x), recursive = TRUE)
+  dir.create(file.path(main_folder, "Part 2", x), recursive = TRUE)
+})
+
