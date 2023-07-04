@@ -25,14 +25,14 @@ set.seed(1234)
 random_numbers <- sample(100000:999999, length(patient_ID), replace = TRUE)
 
 # Generate anonym ID using random numbers
-anonym_ID <- paste0("OPS", random_numbers)
+anonym_ID <- paste0("X", random_numbers)
 
 # Create an assignment table
 assignment_table <- data.frame(originalname = patient_ID, anonym = anonym_ID)
 
 ## Test anonymization and traceability---------------------------------------
 # Example: Patient with follow id "OPS3"
-follow_id <- "OPS971805"
+follow_id <- "X861679"
 originalname <- assignment_table$originalname[assignment_table$anonym == follow_id]
 print(originalname)
 anonymname <- assignment_table$anonym[assignment_table$anonym == follow_id]
@@ -42,7 +42,7 @@ print(anonymname)
 print(assignment_table)
 
 ## Export assignment table------------------------------------------------------
-write.xlsx(assignment_table, "Assignment table.xslx")
+write.xlsx(assignment_table, "Assignment table.xlsx")
 
 ## Add anonym_ID to the dataset-----------------------------------------------
 clinicaldata_matched <- transform(clinicaldata_matched, anonym_ID = anonym_ID)
