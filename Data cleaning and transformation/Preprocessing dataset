@@ -2,20 +2,17 @@
 ## Nelly Blindenbacher
 ## July 2023
 
-## Set path to file path-------------------------------------------------------
-getwd()
-setwd("\\\\fs-home/bline$/Documents/Projekte/9 CT Model vs. Neurologist/2 R Versions/3 Week 27")
+# Set path to file path--------------------------------------------------------
+setwd("\\\\fs-home/bline$/Documents/Projekte/9 CT Model vs. Neurologist/2 R Versions/3 Week 29")
 
-## Dependencies ------------------------------------------------------------------
-install.packages(c("dplyr", "ggplot", "MatchIt", "readxl", "ggpubr", "kableExtra"))
+# Preprocess data--------------------------------------------------------------
+# Dependencies
+install.packages("dplyr")
+install.packages("readxl")
 library(dplyr)
-library(ggplot2)
-library(MatchIt)
 library(readxl)
-library(ggpubr)
-library(kableExtra)
 
-## Load data ------------------------------------------------------------------
+# Load data
 clinicaldata <- read_xlsx("Originaldata_incl_imaging.xlsx") %>%
   
   # Exclude patients with missing imaging data (CTA/CTP)
@@ -23,7 +20,7 @@ clinicaldata <- read_xlsx("Originaldata_incl_imaging.xlsx") %>%
   
   # Exclude patients with missing outcome (NIHSS_24h or MRS_90d)
   filter(!is.na(nihsco_b24h), !is.na(mrs_d90d_c)) %>%
-
+  
   # Variable naming and scaling
   mutate(
     IAT = as.factor(ifelse(i_iatrt == 0, "No", "Yes")),
@@ -59,56 +56,7 @@ clinicaldata <- read_xlsx("Originaldata_incl_imaging.xlsx") %>%
     NIHSS_24h = as.numeric(nihsco_b24h)
   )
 
-
-## Missing data analysis---------------------------------------------------------
-# Dependencies
-install.packages("VIM")
-library(VIM)
-
-# Select relevant baseline variables
-clinicaldata_selection <- clinicaldata %>%
-  select(c("IAT", "sex", "age", "IVT", "INR", "serum_creatinin", "systolic_blood_pressure", "diastolic_blood_pressure", "previous_stroke", 
-           "diabetes_mellitus", "hypertension", "atrial_fibrillation", "prestroke_mrs", "symptom_onset_to_door", "NIHSS_baseline", "occlusion_site", "collateral_score", "followid"))
-
-# Find missing values
-anyNA(clinicaldata_selection)
-missing_values <- colSums(is.na(clinicaldata_selection))
-print(missing_values)
-
-# Show missing values and check for systematic missings
-clinicaldata_missing <- clinicaldata_selection[,c("INR", "serum_creatinin", "symptom_onset_to_door", "collateral_score")]
-na <- aggr(clinicaldata_missing, plot = FALSE)
-plot(na, numbers = TRUE, prop = FALSE, cex.axis = 0.3) # data is not systematically missing
-
-
-## Impute missing data with missForest------------------------------------------
-# Dependencies 
-install.packages("missForest")
-library(missForest)
-
-# Impute missing values
-set.seed(7)
-clinicaldata_selection <- as.data.frame(clinicaldata_selection)
-variables_with_na <- c("INR", "serum_creatinin", "symptom_onset_to_door", "collateral_score")
-clinicaldata_imp <- missForest(clinicaldata_selection[, variables_with_na], 
-                               xtrue = clinicaldata_selection[, variables_with_na], 
-                               verbose = TRUE, maxiter = 50, ntree = 500, mtry = 3)
-clinicaldata_imp$OOBerror
-
-# Save and round imputed values
-clinicaldata_imputed <- clinicaldata_imp$ximp # Save as a data frame
-numeric_vars <- sapply(clinicaldata_imputed, is.numeric) # Identify numeric variables
-clinicaldata_imputed$INR <- round(clinicaldata_imputed$INR, 1) # Round INR to 1 digit after decimal point
-clinicaldata_imputed$serum_creatinin <- round(clinicaldata_imputed$serum_creatinin, 0) # Round serum_creatinin to 0 digits after decimal point
-clinicaldata_imputed$symptom_onset_to_door <- round(clinicaldata_imputed$symptom_onset_to_door, 0) # Round onset_to_door_time to 0 digits after decimal point
-
-# Import imputed values into "clinicaldata" data frame
-clinicaldata$INR <- clinicaldata_imputed$INR
-clinicaldata$serum_creatinin <- clinicaldata_imputed$serum_creatinin
-clinicaldata$symptom_onset_to_door <- clinicaldata_imputed$symptom_onset_to_door
-clinicaldata$collateral_score <- clinicaldata_imputed$collateral_score
-
-## Export cleaned data---------------------------------------- 
+# Export cleaned data 
 install.packages("openxlsx")
 library(openxlsx)
 write.xlsx(clinicaldata, "Data_cleaned.xlsx")
