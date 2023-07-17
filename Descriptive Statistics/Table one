@@ -2,14 +2,14 @@
 ## Nelly Blindenbacher
 ## June 2023
 
-## Set path to file path-------------------------------------------------------
+## Set path to file path
 getwd()
 setwd("\\\\fs-home/bline$/Documents/Projekte/9 CT Model vs. Neurologist/2 R Versions/3 Week 27")
 
-## Load data-------------------------------------------------------
+## Load data
 clinicaldata_cleaned <- read_xlsx("Data_cleaned.xlsx")
 
-## Dependencies--------------------------------------------------------
+## Dependencies
 install.packages("psych")
 install.packages("knitr")
 install.packages("dplyr")
@@ -21,15 +21,15 @@ library(knitr)
 library(dplyr)
 library(tableone)
 
-## Overview--------------------------------------------------------------------
+## Overview
 overview <- summary(clinicaldata_cleaned)
 print(overview)
 
-## Build table one-------------------------------------------------------------
+## Build table one
 myVars <- c("IAT", "sex", "age", "IVT", "INR", "serum_creatinin", "systolic_blood_pressure", "diastolic_blood_pressure", "previous_stroke", 
             "diabetes_mellitus", "hypertension", "atrial_fibrillation", "prestroke_mrs", "symptom_onset_to_door", "NIHSS_baseline", "occlusion_site", "collateral_score", "NIHSS_24h", "MRS_90d")
 
-#OVerall
+#Overall
 tab1 <- CreateTableOne(data = clinicaldata_cleaned, vars = myVars)
 tab1
 
