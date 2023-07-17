@@ -17,7 +17,7 @@ library(VIM)
 # Select relevant baseline variables
 clinicaldata_variables <- clinicaldata_cleaned %>%
   select(c("IAT", "sex", "age", "IVT", "INR", "serum_creatinin", "systolic_blood_pressure", "diastolic_blood_pressure", "previous_stroke", 
-           "diabetes_mellitus", "hypertension", "atrial_fibrillation", "prestroke_mrs", "symptom_onset_to_door", "NIHSS_baseline", "occlusion_site", "collateral_score", "followid", "NIHSS_24h", "MRS_90d"))
+           "diabetes_mellitus", "hypertension", "atrial_fibrillation", "prestroke_mrs", "symptom_onset_to_door", "NIHSS_baseline", "occlusion_site", "collateral_score", "followid"))
 
 # Exclude patients with missing BL data
 anyNA(clinicaldata_variables)
