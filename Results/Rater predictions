@@ -31,5 +31,3 @@ for (file in files) {
 # Save the combined dataframe as an Excel file
 write.xlsx(Prediction_rater, file = "Prediction_rater.xlsx")
 
-# Print the confirmation message
-print("Combined dataframe saved as Prediction_rater.xlsx")
