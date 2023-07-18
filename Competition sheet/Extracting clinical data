@@ -10,13 +10,13 @@ library(kableExtra)
 
 # Load data
 clinicaldata_competition <- read_xlsx("Data_matched_incl_anonymization.xlsx") %>%
-  select(IAT, sex, age, IVT, INR, serum_creatinin, systolic_blood_pressure, diastolic_blood_pressure, previous_stroke, diabetes_mellitus, hypertension, atrial_fibrillation, prestroke_mrs, symptom_onset_to_door, NIHSS_baseline, occlusion_site, collateral_score, anonym_ID)
+  select(`Intra-arterial treatment` = IAT, Sex = sex, `Age (y)` = age, `Intravenous thrombolysis` = IVT, INR, `Serum creatinine (μmol/l)` = serum_creatinin, `Systolic blood pressure (mmHg)` = systolic_blood_pressure, `Diastolic blood pressure (mmHg)` = diastolic_blood_pressure, `History of stroke` = previous_stroke, `Diabetes mellitus` = diabetes_mellitus, Hypertension = hypertension, `Atrial fibrillation` = atrial_fibrillation, `Prestroke mRS (0-6)` = prestroke_mrs, `Time from symptom onset to door (min)` = symptom_onset_to_door, `NIHSS baseline` = NIHSS_baseline, `Occlusion site` = occlusion_site, `Collateral score (0-3)` = collateral_score, anonym_ID_part1, anonym_ID_part2)
 
 # Define the local directory path
-local_directory <- "\\\\fs-home/bline$/Documents/Projekte/9 CT Model vs. Neurologist/2 R Versions/3 Week 27"
+local_directory <- "\\\\fs-home/bline$/Documents/Projekte/9 CT Model vs. Neurologist/2 R Versions/3 Week 29"
 
 # Define the main folder name
-main_folder_name <- "Competition_Data"
+main_folder_name <- "Competition DL vs. Neurologist"
 
 # Create the main folder within the local directory if it doesn't exist
 main_folder <- file.path(local_directory, main_folder_name)
@@ -27,15 +27,22 @@ if (!file.exists(main_folder)) {
 # Save structured data for each patient in the respective subfolder (Part 1 or Part 2)
 for (x in 1:40) {
   # Get the anonym_ID for the current iteration
-  anonym_ID <- clinicaldata_competition$anonym_ID[x]
+  anonym_ID_part1 <- clinicaldata_competition$anonym_ID_part1[x]
+  anonym_ID_part2 <- clinicaldata_competition$anonym_ID_part2[x]
   
-  # Create the kable table
-  kable_table <- kable(clinicaldata_competition[x,], format = "html", escape = FALSE) %>%
+  # Select columns to exclude
+  cols_to_exclude <- c("anonym_ID_part1", "anonym_ID_part2")
+  
+  # Transpose the data for table display, excluding specified columns
+  transposed_data <- t(select(clinicaldata_competition[x, ], -one_of(cols_to_exclude)))
+  
+  # Create the kable table with transposed data
+  kable_table <- kable(transposed_data, format = "html", escape = FALSE) %>%
     kable_styling(bootstrap_options = "striped", full_width = FALSE)
   
   # Specify the subfolder paths for Part 1 and Part 2
-  subfolder_part1 <- file.path(main_folder, "Part 1", anonym_ID)
-  subfolder_part2 <- file.path(main_folder, "Part 2", anonym_ID)
+  subfolder_part1 <- file.path(main_folder, "Part 1", anonym_ID_part1)
+  subfolder_part2 <- file.path(main_folder, "Part 2", anonym_ID_part2)
   
   # Create the subfolders if they don't exist
   if (!file.exists(subfolder_part1)) {
@@ -47,9 +54,23 @@ for (x in 1:40) {
   }
   
   # Save the kable table as an HTML file in the corresponding subfolder (Part 1 or Part 2)
-  html_file_part1 <- file.path(subfolder_part1, paste0("Clinicaldata_", anonym_ID, ".html"))
-  html_file_part2 <- file.path(subfolder_part2, paste0("Clinicaldata_", anonym_ID, ".html"))
+  html_file_part1 <- file.path(subfolder_part1, paste0("Clinicaldata_", anonym_ID_part1, ".html"))
+  html_file_part2 <- file.path(subfolder_part2, paste0("Clinicaldata_", anonym_ID_part2, ".html"))
   
-  writeLines(as.character(kable_table), html_file_part1)
-  writeLines(as.character(kable_table), html_file_part2)
+  # Create the HTML content with title, subtitle, and table
+  html_content_part1 <- sprintf(
+    "<html><head><style>body { display: flex; justify-content: center; align-items: center; height: 100vh; }</style></head><body><div style='text-align: center;'><h1>Competition DL vs. Neurologist</h1>\n<h2>%s</h2>\n\n%s</div></body></html>",
+    anonym_ID_part1,
+    as.character(kable_table)
+  )
+  
+  html_content_part2 <- sprintf(
+    "<html><head><style>body { display: flex; justify-content: center; align-items: center; height: 100vh; }</style></head><body><div style='text-align: center;'><h1>Competition DL vs. Neurologist</h1>\n<h2>%s</h2>\n\n%s</div></body></html>",
+    anonym_ID_part2,
+    as.character(kable_table)
+  )
+  
+  # Write the HTML content to the files
+  writeLines(html_content_part1, html_file_part1)
+  writeLines(html_content_part2, html_file_part2)
 }
