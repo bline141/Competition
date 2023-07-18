@@ -10,6 +10,6 @@ Procedure for competition as follows:
 1. Step: Data cleaning and transformation (Exclusion of patients, definition of variables)
 2. Step: Descriptive Statistics (Table one for the MR cohort)
 3. Step: Selection and Matching (Selection of 40 patients matched for BL variables)
-4. Step: Anonymisation (Assignment of anonymous ID to each patient from the selection)
+4. Step: Anonymisation (Assignment of anonymous ID to each patient from the selection for Part 1 and 2)
 5. Step: Structure (Structuring and organising the folders)
 6. Step: Competition sheet (Clinical data / Imaging Data)
