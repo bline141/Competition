@@ -1,0 +1,34 @@
+## Import prediction sheets
+## Nelly Blindenbacher
+## July 2023
+
+library(fs)
+
+# Define the source Excel file
+sourceFile <- "Projekte/9 CT Model vs. Neurologist/4 Information Sheets/Week 29/Prediction.xlsx"
+
+# Define the target directories
+targetDirPart1 <- "Projekte/9 CT Model vs. Neurologist/2 R Versions/3 Week 29/Competition DL vs. Neurologist/Part 1/"
+targetDirPart2 <- "Projekte/9 CT Model vs. Neurologist/2 R Versions/3 Week 29/Competition DL vs. Neurologist/Part 2/"
+
+# Get the list of subdirectories within the target directories
+subdirectoriesPart1 <- list.dirs(targetDirPart1, recursive = FALSE)
+subdirectoriesPart2 <- list.dirs(targetDirPart2, recursive = FALSE)
+
+# Iterate over each subdirectory in Part 1
+for (subdir in subdirectoriesPart1) {
+  # Construct the path of the target file in the subdirectory
+  targetPath <- file.path(subdir, basename(sourceFile))
+  
+  # Copy the source file to the target path
+  file.copy(sourceFile, targetPath)
+}
+
+# Iterate over each subdirectory in Part 2
+for (subdir in subdirectoriesPart2) {
+  # Construct the path of the target file in the subdirectory
+  targetPath <- file.path(subdir, basename(sourceFile))
+  
+  # Copy the source file to the target path
+  file.copy(sourceFile, targetPath)
+}
