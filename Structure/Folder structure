@@ -2,27 +2,76 @@
 ## Nelly Blindenbacher
 ## July 2023
 
+# Load packages into R
+library(readxl)
+library(dplyr)
+library(writexl)
+library(kableExtra)
+
 # Set directory
 setwd("\\\\fs-home\\bline$\\Documents\\Projekte\\9 CT Model vs. Neurologist\\2 R Versions\\3 Week 29")
 
 # Load data
-clinicaldata_anonym <- read.xlsx("Data_matched_incl_anonymization.xlsx")
+clinicaldata_competition <- read_xlsx("Data_matched_incl_anonymization.xlsx")
 
 # Define the main folder name
-main_folder_name <- "Competition DL vs. Neurologist"
+main_folder_name <- "DL vs Neurologists"
 
-# Create the main folder within the current directory
+# Create the main folder if it doesn't exist
 main_folder <- file.path(getwd(), main_folder_name)
-if (!dir.exists(main_folder)) {
+if (!file.exists(main_folder)) {
   dir.create(main_folder)
 }
 
-# Create subfolders for each anonym_ID of Part 1
-sapply(clinicaldata_anonym$anonym_ID_part1, function(x) {
-  dir.create(file.path(main_folder, "Part 1", x), recursive = TRUE)
-})
+# Function to create rater folders
+create_rater_folder <- function(main_folder, rater_number) {
+  rater_folder_name <- paste0("Rater", rater_number, "_Name")
+  rater_folder <- file.path(main_folder, rater_folder_name)
+  if (!file.exists(rater_folder)) {
+    dir.create(rater_folder)
+  }
+  return(rater_folder)
+}
 
-# Create subfolders for each anonym_ID of Part 2
-sapply(clinicaldata_anonym$anonym_ID_part2, function(x) {
-  dir.create(file.path(main_folder, "Part 2", x), recursive = TRUE)
-})
+# Create the main folder "DL vs neurologists" and the rater folders
+rater_folders <- lapply(1:5, create_rater_folder, main_folder = main_folder)
+
+# Function to create "DL vs Neurologist Part 1" and "DL vs Neurologist Part 2" subfolders for a given rater folder
+create_part_folders <- function(rater_folder) {
+  part1_folder <- file.path(rater_folder, "DL vs Neurologist Part 1")
+  part2_folder <- file.path(rater_folder, "DL vs Neurologist Part 2")
+  
+  if (!file.exists(part1_folder)) {
+    dir.create(part1_folder)
+  }
+  
+  if (!file.exists(part2_folder)) {
+    dir.create(part2_folder)
+  }
+}
+
+# Create "DL vs Neurologist Part 1" and "DL vs Neurologist Part 2" subfolders for each rater
+lapply(rater_folders, create_part_folders)
+
+# Function to create patient folders within "DL vs Neurologist Part 1" and "DL vs Neurologist Part 2" subfolders
+create_patient_folders <- function(part_folder, anonym_ID_vector) {
+  for (anonym_ID in anonym_ID_vector) {
+    patient_folder <- file.path(part_folder, anonym_ID)
+    if (!file.exists(patient_folder)) {
+      dir.create(patient_folder)
+    }
+  }
+}
+
+# Create patient folders within "DL vs Neurologist Part 1" and "DL vs Neurologist Part 2" subfolders for each rater
+for (rater_number in 1:5) {
+  rater_folder <- rater_folders[[rater_number]]
+  anonym_ID_part1_vector <- unique(clinicaldata_competition$anonym_ID_part1)
+  anonym_ID_part2_vector <- unique(clinicaldata_competition$anonym_ID_part2)
+  
+  part1_folder <- file.path(rater_folder, "DL vs Neurologist Part 1")
+  part2_folder <- file.path(rater_folder, "DL vs Neurologist Part 2")
+  
+  create_patient_folders(part1_folder, anonym_ID_part1_vector)
+  create_patient_folders(part2_folder, anonym_ID_part2_vector)
+}
