@@ -5,6 +5,14 @@
 # Set path to file path
 setwd("\\\\fs-home/bline$/Documents/Projekte/9 CT Model vs. Neurologist/2 R Versions/3 Week 29")
 
+# Load packages into R
+library(readxl)
+library(kableExtra)
+library(dplyr)
+library(ggplot2)
+library(MatchIt)
+library(ggpubr)
+
 # Load data
 clinicaldata_cleaned <- read_xlsx("Data_cleaned.xlsx") %>%
   mutate(IAT = as.factor(IAT))
@@ -33,14 +41,6 @@ clinicaldata_selection <- clinicaldata_variables %>%
 # Source Files
 source("analysisPlot.R") # distribution plot
 
-# Dependencies
-install.packages(c("dplyr", "ggplot", "MatchIt", "readxl", "ggpubr", "kableExtra"))
-library(dplyr)
-library(ggplot2)
-library(MatchIt)
-library(readxl)
-library(ggpubr)
-library(kableExtra)
 
 # Visualize Data Distribution
 plotColumns0 <- c("IAT", "sex", "age", "IVT", "systolic_blood_pressure", "diastolic_blood_pressure", "previous_stroke", 
