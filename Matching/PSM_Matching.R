@@ -5,13 +5,14 @@
 # Set path to file path
 setwd("\\\\fs-home/bline$/Documents/Projekte/9 CT Model vs. Neurologist/2 R Versions/3 Week 29")
 
-# Load packages into R
+# Dependencies
 library(readxl)
 library(kableExtra)
 library(dplyr)
 library(ggplot2)
 library(MatchIt)
 library(ggpubr)
+library(openxlsx)
 
 # Load data
 clinicaldata_cleaned <- read_xlsx("Data_cleaned.xlsx") %>%
