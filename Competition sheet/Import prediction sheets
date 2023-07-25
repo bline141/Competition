@@ -1,38 +1,65 @@
-## Import prediction sheets
+## Import prediction sheets (incl Rater and Patient_ID)
 ## Nelly Blindenbacher
 ## July 2023
 
+# Dependencies
+install.packages("openxlsx")
+library(openxlsx)
 library(fs)
+library(kableExtra)
 
-getwd()
-setwd("\\\\fs-home/bline$/Documents/")
+# Set directory
+setwd("\\\\fs-home/bline$/Documents/Projekte/9 CT Model vs. Neurologist/2 R Scripts/Project Version Juli/Week 30")
 
+# Load data
+clinicaldata_competition <- read.xlsx("Data_matched_incl_anonymization.xlsx")
 
-# Define the source Excel file
-sourceFile <- "Projekte/9 CT Model vs. Neurologist/4 Information Sheets/Week 29/Prediction.xlsx"
+# Define the main folder name
+main_folder_name <- "DL vs neurologists"
 
-# Define the target directories
-targetDirPart1 <- "Projekte/9 CT Model vs. Neurologist/2 R Versions/3 Week 29/Competition DL vs. Neurologist/Part 1/"
-targetDirPart2 <- "Projekte/9 CT Model vs. Neurologist/2 R Versions/3 Week 29/Competition DL vs. Neurologist/Part 2/"
-
-# Get the list of subdirectories within the target directories
-subdirectoriesPart1 <- list.dirs(targetDirPart1, recursive = FALSE)
-subdirectoriesPart2 <- list.dirs(targetDirPart2, recursive = FALSE)
-
-# Iterate over each subdirectory in Part 1
-for (subdir in subdirectoriesPart1) {
-  # Construct the path of the target file in the subdirectory
-  targetPath <- file.path(subdir, basename(sourceFile))
-  
-  # Copy the source file to the target path
-  file.copy(sourceFile, targetPath)
+# Create the main folder if it doesn't exist
+main_folder <- file.path(getwd(), main_folder_name)
+if (!file.exists(main_folder)) {
+  stop("Main folder 'DL vs neurologists' does not exist. Run the script for creating folder structure first.")
 }
 
-# Iterate over each subdirectory in Part 2
-for (subdir in subdirectoriesPart2) {
-  # Construct the path of the target file in the subdirectory
-  targetPath <- file.path(subdir, basename(sourceFile))
+# Function to save prediction.xlsx in patient folders
+save_prediction_file <- function(anonym_ID_vector, part_folder, part_file, rater_number) {
+  for (anonym_ID in anonym_ID_vector) {
+    patient_folder <- file.path(part_folder, anonym_ID)
+    if (!file.exists(patient_folder)) {
+      stop("Patient folder not found. Run the script for creating folder structure first.")
+    }
+    
+    # Read the prediction file
+    prediction_file <- file.path(getwd(), part_file)
+    prediction_data <- read.xlsx(prediction_file)
+    
+    # Add the Rater column to the dataset and set the value to the rater_number
+    prediction_data$Rater <- rater_number
+    
+    # Add the Anonym_ID column to the dataset and set the value to the current anonym_ID
+    prediction_data$Patient_ID <- anonym_ID
+    
+    # Save the updated dataset back to the prediction file
+    write.xlsx(prediction_data, prediction_file)
+    
+    # Copy or move the updated prediction.xlsx to the patient folder
+    file.copy(from = prediction_file, to = patient_folder)
+  }
+}
+
+# Save prediction.xlsx for each patient in the respective subfolder (Part 1 or Part 2) for each rater
+for (rater_number in 1:5) {
+  rater_folder <- file.path(main_folder, paste0("Rater", rater_number, "_Name"))
+  part1_folder <- file.path(rater_folder, "DL vs Neurologist Part 1")
+  part2_folder <- file.path(rater_folder, "DL vs Neurologist Part 2")
   
-  # Copy the source file to the target path
-  file.copy(sourceFile, targetPath)
+  # Anonymized IDs for Part 1 and Part 2
+  anonym_ID_part1_vector <- unique(clinicaldata_competition$anonym_ID_part1)
+  anonym_ID_part2_vector <- unique(clinicaldata_competition$anonym_ID_part2)
+  
+  # Save Prediction_Part 1.xlsx for Part 1 and Prediction_Part 2.xlsx for Part 2 for the current rater
+  save_prediction_file(anonym_ID_part1_vector, part1_folder, "Prediction_Part 1.xlsx", rater_number)
+  save_prediction_file(anonym_ID_part2_vector, part2_folder, "Prediction_Part 2.xlsx", rater_number)
 }
