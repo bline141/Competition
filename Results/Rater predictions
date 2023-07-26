@@ -2,32 +2,30 @@
 ## Nelly Blindenbacher
 ## July 2023
 
-getwd()
+# Set the working directory
+setwd("\\\\fs-home/bline$/Documents/Projekte/9 CT Model vs. Neurologist/2 R Scripts/Project Version Juli/Week 30")
 
-# Install and load the openxlsx package
-if (!requireNamespace("openxlsx", quietly = TRUE)) {
-  install.packages("openxlsx")
-}
+# Install and load the required packages
+install.packages("openxlsx")
 library(openxlsx)
 
 # Define the directory containing the XLSX files
-directory <- "9 CT Model vs. Neurologist/2 R Versions/3 Week 29/Competition DL vs. Neurologist/Part 1"
+directory <- "DL vs Neurologists/"
 
-# Get the list of XLSX files within the directory
+# Get the list of every XLSX files within the directory
 files <- list.files(directory, pattern = "\\.xlsx$", full.names = TRUE, recursive = TRUE)
 
 # Create an empty dataframe to store the combined data
-Prediction_rater <- data.frame()
+prediction_neurologist <- data.frame()
 
 # Iterate over each XLSX file
 for (file in files) {
   # Read the XLSX file into a data frame, skipping the first row
-  data <- read.xlsx(file, startRow = 2)
+  data <- read.xlsx(file)
   
   # Append the data to the combined dataframe
-  Prediction_rater <- rbind(Prediction_rater, data)
+  prediction_neurologist <- rbind(prediction_neurologist, data)
 }
 
 # Save the combined dataframe as an Excel file
-write.xlsx(Prediction_rater, file = "Prediction_rater.xlsx")
-
+write.xlsx(prediction_neurologist, file = "Prediction_neurologist.xlsx")
