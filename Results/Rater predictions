@@ -27,5 +27,11 @@ for (file in files) {
   prediction_neurologist <- rbind(prediction_neurologist, data)
 }
 
+# Subset the dataframe to include the columns "NIHSS_24h" and "MRS_90d"
+summary_data <- prediction_neurologist[c("NIHSS_24h", "MRS_90d")]
+
+# Display a summary of the selected columns
+summary(summary_data)
+
 # Save the combined dataframe as an Excel file
 write.xlsx(prediction_neurologist, file = "Prediction_neurologist.xlsx")
