@@ -1,5 +1,5 @@
 ## Folder structure
-## Nelly Blindenbacher
+## N.B.
 ## July 2023
 
 # Load packages into R
@@ -9,7 +9,6 @@ library(writexl)
 library(kableExtra)
 
 # Set directory
-setwd("\\\\fs-home\\bline$\\Documents\\Projekte\\9 CT Model vs. Neurologist\\2 R Versions\\3 Week 29")
 
 # Load data
 clinicaldata_competition <- read_xlsx("Data_matched_incl_anonymization.xlsx")
@@ -75,3 +74,4 @@ for (rater_number in 1:5) {
   create_patient_folders(part1_folder, anonym_ID_part1_vector)
   create_patient_folders(part2_folder, anonym_ID_part2_vector)
 }
+
