@@ -12,5 +12,5 @@ Procedure for competition as follows:
 3. Step: Selection and Matching (Selection of 40 patients matched for BL variables)
 4. Step: Anonymisation (Assignment of anonymous ID to each patient from the selection for Part 1 and 2)
 5. Step: Structure (Structuring and organising the folders for x raters)
-6. Step: Competition sheet (Clinical data / Imaging Data / Prediction)
+6. Step: Competition sheets (Clinical data / Imaging Data / Prediction)
 7. Step: Results (Collecting all the information from different raters in one table)
