@@ -1,15 +1,16 @@
 ## Preprocessing dataset
-## Nelly Blindenbacher
+## N.B.
 ## July 2023
 
 # Set path to file path
-setwd("\\\\fs-home/bline$/Documents/Projekte/9 CT Model vs. Neurologist/2 R Versions/3 Week 29")
 
 # Dependencies
 install.packages("dplyr")
 install.packages("readxl")
+install.packages("openxlsx")
 library(dplyr)
 library(readxl)
+library(openxlsx)
 
 # Load data
 clinicaldata <- read_xlsx("Originaldata_incl_imaging.xlsx") %>%
@@ -23,7 +24,7 @@ clinicaldata <- read_xlsx("Originaldata_incl_imaging.xlsx") %>%
   # Variable naming and scaling
   mutate(
     IAT = as.factor(ifelse(i_iatrt == 0, "No", "Yes")),
-    sex = as.factor(ifelse(r_gender == 0, "M", "F")),
+    sex = as.factor(ifelse(r_gender == 0, "F", "M")),
     age = round(as.numeric(age)),
     IVT = as.factor(ifelse(r_ivtrom == 0, "No", "Yes")),
     INR = as.numeric(linr_abl),
@@ -56,6 +57,4 @@ clinicaldata <- read_xlsx("Originaldata_incl_imaging.xlsx") %>%
   )
 
 # Export cleaned data 
-install.packages("openxlsx")
-library(openxlsx)
 write.xlsx(clinicaldata, "Data_cleaned.xlsx")
