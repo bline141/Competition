@@ -1,9 +1,8 @@
 ## Anonymization
-## Nelly Blindenbacher
+## N.B.
 ## June 2023
 
 # Set directory
-setwd("\\\\fs-home/bline$/Documents/Projekte/9 CT Model vs. Neurologist/2 R Versions/3 Week 29")
 
 # Dependencies
 install.packages("readxl")
@@ -32,7 +31,7 @@ set.seed(5678)
 random_numbers_part2 <- sample(100000:999999, length(patient_ID), replace = TRUE)
 
 # Generate anonym ID using random numbers for Part 2
-anonym_ID_part2 <- paste0("X", random_numbers_part2)
+anonym_ID_part2 <- paste0("Y", random_numbers_part2)
 
 # Create an assignment table
 assignment_table <- data.frame(originalname = patient_ID, anonym_part1 = anonym_ID_part1, anonym_part2 = anonym_ID_part2)
