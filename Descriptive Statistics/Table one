@@ -1,10 +1,8 @@
 ## Descriptive Statistics
-## Nelly Blindenbacher
+## N.B.
 ## June 2023
 
 ## Set path to file path
-getwd()
-setwd("\\\\fs-home/bline$/Documents/Projekte/9 CT Model vs. Neurologist/2 R Versions/3 Week 27")
 
 ## Load data
 clinicaldata_cleaned <- read_xlsx("Data_cleaned.xlsx")
