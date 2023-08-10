@@ -1,14 +1,12 @@
 ## Extracting clinical data
-## Nelly Blindenbacher
+## N.B.
 ## July 2023
 
 # Load packages into R
 library(readxl)
 library(kableExtra)
-library(dplyr)
 
 # Set the working directory
-setwd("\\\\fs-home/bline$/Documents/Projekte/9 CT Model vs. Neurologist/2 R Versions/3 Week 29")
 
 # Load data
 clinicaldata_competition <- read_xlsx("Data_matched_incl_anonymization.xlsx") %>%
@@ -23,7 +21,45 @@ if (!file.exists(main_folder)) {
   stop("Main folder 'DL vs neurologists' does not exist. Run the script for creating folder structure first.")
 }
 
-# Save clinical data for each patient in the respective subfolder (Part 1 or Part 2) for each rater
+# Define the function to save clinical data in patient folders
+save_clinical_data <- function(anonym_ID_vector, part_folder, clinicaldata_competition) {
+  for (anonym_ID in anonym_ID_vector) {
+    patient_folder <- file.path(part_folder, anonym_ID)
+    if (!file.exists(patient_folder)) {
+      stop("Patient folder not found. Run the script for creating folder structure first.")
+    }
+    
+    # Filter clinical data for the current patient
+    patient_data <- clinicaldata_competition %>%
+      filter((part_folder == part1_folder & anonym_ID_part1 == anonym_ID) |
+               (part_folder == part2_folder & anonym_ID_part2 == anonym_ID))
+    
+    # Select columns to exclude
+    cols_to_exclude <- c("anonym_ID_part1", "anonym_ID_part2")
+    
+    # Transpose the data for table display, excluding specified columns
+    transposed_data <- t(select(patient_data, -one_of(cols_to_exclude)))
+    
+    # Create the kable table with transposed data
+    kable_table <- kable(transposed_data, format = "html", escape = FALSE) %>%
+      kable_styling(bootstrap_options = "striped", full_width = FALSE)
+    
+    # Save the kable table as an HTML file in the patient folder
+    html_file <- file.path(patient_folder, paste0("Clinicaldata_", anonym_ID, ".html"))
+    
+    # Create the HTML content with title, subtitle, and table
+    html_content <- sprintf(
+      "<html><head><style>body { display: flex; justify-content: center; align-items: center; height: 100vh; }</style></head><body><div style='text-align: center;'><h1>DL vs Neurologist</h1>\n<h2>%s</h2>\n\n%s</div></body></html>",
+      anonym_ID,
+      as.character(kable_table)
+    )
+    
+    # Write the HTML content to the file
+    writeLines(html_content, html_file)
+  }
+}
+
+# Managing and Storing Clinical Data for Raters and Parts
 for (rater_number in 1:5) {
   rater_folder <- file.path(main_folder, paste0("Rater", rater_number, "_Name"))
   part1_folder <- file.path(rater_folder, "DL vs Neurologist Part 1")
@@ -32,45 +68,7 @@ for (rater_number in 1:5) {
   anonym_ID_part1_vector <- unique(clinicaldata_competition$anonym_ID_part1)
   anonym_ID_part2_vector <- unique(clinicaldata_competition$anonym_ID_part2)
   
-  # Function to save clinical data in patient folders
-  save_clinical_data <- function(anonym_ID_vector, part_folder) {
-    for (anonym_ID in anonym_ID_vector) {
-      patient_folder <- file.path(part_folder, anonym_ID)
-      if (!file.exists(patient_folder)) {
-        stop("Patient folder not found. Run the script for creating folder structure first.")
-      }
-      
-      # Filter clinical data for the current patient
-      patient_data <- clinicaldata_competition %>%
-        filter((part_folder == part1_folder & anonym_ID_part1 == anonym_ID) |
-                 (part_folder == part2_folder & anonym_ID_part2 == anonym_ID))
-      
-      # Select columns to exclude
-      cols_to_exclude <- c("anonym_ID_part1", "anonym_ID_part2")
-      
-      # Transpose the data for table display, excluding specified columns
-      transposed_data <- t(select(patient_data, -one_of(cols_to_exclude)))
-      
-      # Create the kable table with transposed data
-      kable_table <- kable(transposed_data, format = "html", escape = FALSE) %>%
-        kable_styling(bootstrap_options = "striped", full_width = FALSE)
-      
-      # Save the kable table as an HTML file in the patient folder
-      html_file <- file.path(patient_folder, paste0("Clinicaldata_", anonym_ID, ".html"))
-      
-      # Create the HTML content with title, subtitle, and table
-      html_content <- sprintf(
-        "<html><head><style>body { display: flex; justify-content: center; align-items: center; height: 100vh; }</style></head><body><div style='text-align: center;'><h1>DL vs Neurologist</h1>\n<h2>%s</h2>\n\n%s</div></body></html>",
-        anonym_ID,
-        as.character(kable_table)
-      )
-      
-      # Write the HTML content to the file
-      writeLines(html_content, html_file)
-    }
-  }
-  
   # Save clinical data for Part 1 and Part 2 for the current rater
-  save_clinical_data(anonym_ID_part1_vector, part1_folder)
-  save_clinical_data(anonym_ID_part2_vector, part2_folder)
+  save_clinical_data(anonym_ID_part1_vector, part1_folder, clinicaldata_competition)
+  save_clinical_data(anonym_ID_part2_vector, part2_folder, clinicaldata_competition)
 }
