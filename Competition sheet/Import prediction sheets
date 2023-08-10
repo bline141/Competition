@@ -1,5 +1,5 @@
 ## Import prediction sheets (incl Rater and Patient_ID)
-## Nelly Blindenbacher
+## N.B.
 ## July 2023
 
 # Dependencies
@@ -9,7 +9,6 @@ library(fs)
 library(kableExtra)
 
 # Set directory
-setwd("\\\\fs-home/bline$/Documents/Projekte/9 CT Model vs. Neurologist/2 R Scripts/Project Version Juli/Week 30")
 
 # Load data
 clinicaldata_competition <- read.xlsx("Data_matched_incl_anonymization.xlsx")
@@ -63,3 +62,4 @@ for (rater_number in 1:5) {
   save_prediction_file(anonym_ID_part1_vector, part1_folder, "Prediction_Part 1.xlsx", rater_number)
   save_prediction_file(anonym_ID_part2_vector, part2_folder, "Prediction_Part 2.xlsx", rater_number)
 }
+
