@@ -1,9 +1,8 @@
 ## Rater predictions
-## Nelly Blindenbacher
+## N.B.
 ## July 2023
 
 # Set the working directory
-setwd("\\\\fs-home/bline$/Documents/Projekte/9 CT Model vs. Neurologist/2 R Scripts/Project Version Juli/Week 30")
 
 # Install and load the required packages
 install.packages("openxlsx")
@@ -34,4 +33,5 @@ summary_data <- prediction_neurologist[c("NIHSS_24h", "MRS_90d")]
 summary(summary_data)
 
 # Save the combined dataframe as an Excel file
-write.xlsx(prediction_neurologist, file = "Prediction_neurologist.xlsx")
+write.xlsx(prediction_neurologist, file = "Predictions_neurologist.xlsx")
+
